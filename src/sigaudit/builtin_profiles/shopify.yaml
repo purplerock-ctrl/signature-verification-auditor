@@ -1,0 +1,9 @@
+# Shopify-style: base64 (not hex) HMAC-SHA256 over the raw body. No timestamp.
+name: shopify
+description: Shopify-style X-Shopify-Hmac-Sha256, base64 HMAC-SHA256 over the raw body (no timestamp)
+algorithm: sha256
+signed_payload: "{body}"
+signature_header: X-Shopify-Hmac-Sha256
+signature_format: "{signature}"
+signature_encoding: base64
+secret_encoding: utf8

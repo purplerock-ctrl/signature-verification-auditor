@@ -1,0 +1,11 @@
+# The simplest common scheme: HMAC-SHA256 over the raw request body,
+# hex-encoded, in a single header. Many in-house and smaller SaaS webhooks
+# look like this. No timestamp, so there is no built-in replay protection.
+name: generic-hmac-sha256
+description: HMAC-SHA256 of the raw body, hex-encoded, in X-Signature (no timestamp)
+algorithm: sha256
+signed_payload: "{body}"
+signature_header: X-Signature
+signature_format: "{signature}"
+signature_encoding: hex
+secret_encoding: utf8

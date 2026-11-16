@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Audit output: reports contain request/response data from real endpoints.
+# Keep them out of version control unless you mean to publish them.
+sigaudit-report*.json
+sigaudit-report*.md
+reports/
+
+# Never commit secrets
+.env
+*.secret

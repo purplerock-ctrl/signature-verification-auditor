@@ -1,0 +1,59 @@
+# Example provider profile for a fictional "Acme Payments" service.
+#
+# Validate it:   sigaudit profiles examples/custom-profile.yaml
+# Use it:        sigaudit run URL --profile examples/custom-profile.yaml --secret-env ACME_SECRET
+#
+# Every key is listed here. Only name, description, algorithm, signed_payload,
+# signature_header and signature_format are required.
+
+# Identifier shown in reports. Lowercase letters, digits, '-' or '_'.
+name: acme
+
+# One line describing the scheme.
+description: Acme Payments, "t=<ts>,sig=<hex>" over "timestamp.body" plus a timestamp header
+
+# HMAC hash function: sha1, sha256 or sha512.
+algorithm: sha256
+
+# The exact string that gets HMAC'd. {body} is the raw request body and must
+# appear exactly once. {timestamp} is optional (unix seconds). Any other text
+# is literal, e.g. "v0:{timestamp}:{body}" for Slack.
+signed_payload: "{timestamp}.{body}"
+
+# Header carrying the signature, and the layout of its value.
+# {signature} is required; {timestamp} is optional.
+signature_header: X-Acme-Signature
+signature_format: "t={timestamp},sig={signature}"
+
+# How the signature bytes are written: hex or base64.
+signature_encoding: hex
+
+# How to turn the secret you supply into key bytes:
+#   utf8   - use the string as-is (most providers, including Stripe's "whsec_...")
+#   hex    - the string is the hex form of the raw key
+#   base64 - the string is the base64 form of the raw key
+secret_encoding: utf8
+
+# Only for schemes with replay protection. The timestamp must also appear in
+# signed_payload: an unsigned timestamp can be edited by an attacker and
+# protects nothing.
+timestamp:
+  # How old a timestamp a correct receiver still accepts. The replay case
+  # sends one well outside this window (tolerance + 1 hour by default).
+  tolerance_seconds: 300
+  # Set only if the timestamp travels in its own header (Slack-style). Leave
+  # it out if {timestamp} is inside signature_format. Here it's both, to show
+  # the option.
+  header: X-Acme-Timestamp
+
+# Content-Type for the requests (default application/json).
+content_type: application/json
+
+# Extra headers sent with every request, e.g. an event-type header your
+# receiver routes on. Pick a harmless event type.
+extra_headers:
+  X-Acme-Event: test.ping
+
+# Links to the provider's verification docs. Shown in reports.
+references:
+  - https://docs.acme.example/webhooks/verify

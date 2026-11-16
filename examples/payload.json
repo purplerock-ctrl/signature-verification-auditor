@@ -1,0 +1,8 @@
+{
+  "id": "__SIGAUDIT_EVENT_ID__",
+  "type": "test.ping",
+  "livemode": false,
+  "data": {
+    "note": "Custom sigaudit test payload. __SIGAUDIT_EVENT_ID__ is replaced with a unique ID per request."
+  }
+}
