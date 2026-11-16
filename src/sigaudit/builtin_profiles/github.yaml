@@ -11,3 +11,5 @@ signature_encoding: hex
 secret_encoding: utf8
 extra_headers:
   X-GitHub-Event: ping
+references:
+  - https://docs.github.com/en/webhooks/using-webhooks/validating-webhook-deliveries
