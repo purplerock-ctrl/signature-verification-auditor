@@ -21,6 +21,7 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 from types import MappingProxyType
 
+from sigaudit import __version__
 from sigaudit.profiles import HashAlgorithm, ProviderProfile
 from sigaudit.signing import Signer, format_header_value
 
@@ -29,6 +30,9 @@ from sigaudit.signing import Signer, format_header_value
 EVENT_ID_TOKEN = "__SIGAUDIT_EVENT_ID__"  # noqa: S105 - a placeholder, not a password
 
 MALFORMED_SIGNATURE = "!!sigaudit-malformed-signature!!"
+
+#: Identifies the tool to the receiver (and its logs). Override with --header.
+USER_AGENT = f"sigaudit/{__version__} (webhook signature verification auditor)"
 
 
 class Expectation(StrEnum):
@@ -116,6 +120,7 @@ class BuildContext:
 
     def request(self, signing_headers: Mapping[str, str], body: bytes) -> RequestSpec:
         headers = {
+            "User-Agent": USER_AGENT,
             "Content-Type": self.profile.content_type,
             **self.profile.extra_headers,
             **self.extra_headers,
