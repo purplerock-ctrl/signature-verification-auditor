@@ -128,7 +128,8 @@ def build_parser() -> argparse.ArgumentParser:
     run = sub.add_parser(
         "run",
         help="audit an endpoint you are authorized to test",
-        description="Audit an endpoint you own or are explicitly authorized to test. " + REMINDER,
+        description="Send deliberately bad webhook callbacks and report any that are accepted. "
+        + REMINDER,
     )
     run.add_argument("url", help="the webhook endpoint URL (http or https)")
     run.add_argument(
@@ -234,8 +235,12 @@ def build_parser() -> argparse.ArgumentParser:
     _add_output_args(demo)
 
     # --- profiles / cases ----------------------------------------------------
-    prof = sub.add_parser("profiles", help="list built-in profiles, or show one")
-    prof.add_argument("name", nargs="?", help="profile to print as YAML")
+    prof = sub.add_parser(
+        "profiles", help="list built-in profiles, show one, or validate a profile file"
+    )
+    prof.add_argument(
+        "name", nargs="?", help="built-in profile to print, or a YAML/JSON file to validate"
+    )
     sub.add_parser("cases", help="list the audit cases")
     return parser
 
@@ -463,7 +468,22 @@ def cmd_demo(args: argparse.Namespace, io: CliIO) -> int:
 def cmd_profiles(args: argparse.Namespace, io: CliIO) -> int:
     if args.name:
         try:
-            io.stdout.write(builtin_profile_text(args.name))
+            if args.name in builtin_profile_names():
+                io.stdout.write(builtin_profile_text(args.name))
+            else:
+                p = resolve_profile(args.name)
+                ts = (
+                    f"timestamp tolerance {p.timestamp.tolerance_seconds}s"
+                    if p.timestamp
+                    else "no timestamp (replay case will be skipped)"
+                )
+                io.stdout.write(
+                    f"OK: {args.name} defines profile {p.name!r}: {p.description}\n"
+                    f"  signs {p.signed_payload!r} with HMAC-{p.algorithm.value.upper()}, "
+                    f"{p.signature_encoding.value}-encoded\n"
+                    f"  sends {p.signature_header}: {p.signature_format}\n"
+                    f"  {ts}\n"
+                )
         except ProfileError as exc:
             raise UsageError(str(exc)) from None
         return 0
@@ -502,3 +522,10 @@ def main(argv: Sequence[str] | None = None, io: CliIO | None = None) -> int:
     except KeyboardInterrupt:
         io.stderr.write("sigaudit: interrupted\n")
         return 130
+    except BrokenPipeError:
+        # Output was piped into something that stopped reading (e.g. `| head`).
+        # Exit quietly instead of printing a traceback, as Unix tools do.
+        if io.stdout is sys.stdout:
+            devnull = os.open(os.devnull, os.O_WRONLY)
+            os.dup2(devnull, sys.stdout.fileno())
+        return 141  # 128 + SIGPIPE, the conventional status

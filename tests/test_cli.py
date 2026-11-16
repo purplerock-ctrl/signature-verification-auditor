@@ -262,3 +262,32 @@ def test_profiles_and_cases_commands() -> None:
     fio = FakeIO()
     assert main(["cases"], fio) == 0
     assert "tampered-body" in fio.out
+
+
+def test_profiles_validates_a_file(tmp_path: Path) -> None:
+    good = tmp_path / "acme.yaml"
+    good.write_text(
+        "name: acme\ndescription: Acme\nalgorithm: sha256\n"
+        'signed_payload: "{body}"\nsignature_header: X-Acme-Signature\n'
+        'signature_format: "{signature}"\n'
+    )
+    fio = FakeIO()
+    assert main(["profiles", str(good)], fio) == 0
+    assert "OK:" in fio.out
+    assert "replay case will be skipped" in fio.out
+
+    bad = tmp_path / "bad.yaml"
+    bad.write_text("name: bad\n")
+    fio = FakeIO()
+    assert main(["profiles", str(bad)], fio) == ExitCode.REFUSED
+    assert "missing required" in fio.err
+
+
+def test_broken_pipe_exits_quietly() -> None:
+    class ClosedPipe(io.StringIO):
+        def write(self, _s: str) -> int:
+            raise BrokenPipeError
+
+    fio = FakeIO()
+    fio.stdout = ClosedPipe()
+    assert main(["profiles"], fio) == 141
