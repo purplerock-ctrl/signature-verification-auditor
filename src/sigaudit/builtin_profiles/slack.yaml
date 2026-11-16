@@ -11,3 +11,5 @@ secret_encoding: utf8
 timestamp:
   tolerance_seconds: 300
   header: X-Slack-Request-Timestamp
+references:
+  - https://api.slack.com/authentication/verifying-requests-from-slack

@@ -11,3 +11,5 @@ signature_encoding: hex
 secret_encoding: utf8
 timestamp:
   tolerance_seconds: 300
+references:
+  - https://docs.stripe.com/webhooks
