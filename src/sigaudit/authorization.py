@@ -41,15 +41,17 @@ class AuthorizationRecord:
     scope_note: str | None = None
 
     def statement(self) -> str:
+        when = self.confirmed_at.isoformat(timespec="seconds")
+        if self.method == "demo":
+            return (
+                f"Demo run at {when}: the target was sigaudit's own local demo receiver, "
+                "so no third-party system was tested."
+            )
         how = {
             "flag": "via the --i-am-authorized flag",
             "interactive": "by typing the target hostname at an interactive prompt",
-            "demo": "automatically: the target was sigaudit's own local demo receiver",
         }[self.method]
-        text = (
-            f"The operator confirmed authorization to test {self.target_host} {how} "
-            f"at {self.confirmed_at.isoformat(timespec='seconds')}."
-        )
+        text = f"The operator confirmed authorization to test {self.target_host} {how} at {when}."
         if self.scope_note:
             text += f" Scope note: {self.scope_note}"
         return text

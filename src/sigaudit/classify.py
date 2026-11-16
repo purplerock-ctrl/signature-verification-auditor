@@ -3,11 +3,18 @@
 This module only says what *happened*. Whether that is good or bad depends on
 the case and is decided in :mod:`sigaudit.runner`.
 
-By default 2xx means accepted and anything else means rejected. Apps differ,
-though: some return ``200 {"error": ...}`` for rejected events, some return
-``202`` for everything. So both sides can be overridden with a status spec
-and/or a body substring. When both are given, a response that matches
-neither (or both) is UNCLEAR rather than guessed.
+Apps differ: some return ``200 {"error": ...}`` for rejected events, some
+``202`` for everything. So either side can be described with a status spec
+and/or a body substring:
+
+==================  ====================================================
+rules given         behaviour
+==================  ====================================================
+neither             2xx = accepted, anything else = rejected
+accept only         matches accept = accepted, anything else = rejected
+reject only         matches reject = rejected; otherwise 2xx = accepted
+both                strict: matching neither (or both) = UNCLEAR
+==================  ====================================================
 """
 
 from __future__ import annotations
@@ -98,22 +105,34 @@ DEFAULT_ACCEPT = ResponseMatcher.build(status_spec="2xx")
 
 @dataclass(frozen=True, slots=True)
 class Classifier:
-    accept: ResponseMatcher = DEFAULT_ACCEPT
+    accept: ResponseMatcher | None = None  # None: the default rule (2xx)
     reject: ResponseMatcher | None = None  # None: anything that is not accepted
 
     def classify(self, status: int, body: str) -> Outcome:
-        accepted = self.accept.matches(status, body)
-        if self.reject is None:
-            return Outcome.ACCEPTED if accepted else Outcome.REJECTED
-        rejected = self.reject.matches(status, body)
-        if accepted and not rejected:
-            return Outcome.ACCEPTED
-        if rejected and not accepted:
+        if self.accept is not None and self.reject is not None:
+            accepted = self.accept.matches(status, body)
+            rejected = self.reject.matches(status, body)
+            if accepted != rejected:
+                return Outcome.ACCEPTED if accepted else Outcome.REJECTED
+            return Outcome.UNCLEAR
+        if self.reject is not None and self.reject.matches(status, body):
             return Outcome.REJECTED
-        return Outcome.UNCLEAR
+        accept = self.accept or DEFAULT_ACCEPT
+        return Outcome.ACCEPTED if accept.matches(status, body) else Outcome.REJECTED
 
     def describe(self) -> dict[str, str]:
+        if self.accept is not None and self.reject is not None:
+            return {
+                "accepted_when": self.accept.describe(),
+                "rejected_when": self.reject.describe(),
+                "otherwise": "unclear (inconclusive)",
+            }
+        if self.reject is not None:
+            return {
+                "accepted_when": f"{DEFAULT_ACCEPT.describe()} and not rejected",
+                "rejected_when": f"{self.reject.describe()}, or any non-2xx status",
+            }
         return {
-            "accepted_when": self.accept.describe(),
-            "rejected_when": self.reject.describe() if self.reject else "anything else",
+            "accepted_when": (self.accept or DEFAULT_ACCEPT).describe(),
+            "rejected_when": "anything else",
         }

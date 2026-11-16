@@ -65,3 +65,17 @@ def test_matcher_requires_a_condition() -> None:
 def test_describe() -> None:
     m = ResponseMatcher.build("200", "ok")
     assert m.describe() == "status in 200 and body contains 'ok'"
+
+
+def test_reject_rule_alone_takes_precedence_over_default_2xx() -> None:
+    c = Classifier(reject=ResponseMatcher.build(body_contains="invalid signature"))
+    assert c.classify(200, '{"error": "invalid signature"}') is Outcome.REJECTED
+    assert c.classify(200, '{"received": true}') is Outcome.ACCEPTED
+    assert c.classify(401, "unauthorized") is Outcome.REJECTED
+    assert "not rejected" in c.describe()["accepted_when"]
+
+
+def test_accept_rule_alone() -> None:
+    c = Classifier(accept=ResponseMatcher.build("202"))
+    assert c.classify(202, "") is Outcome.ACCEPTED
+    assert c.classify(200, "") is Outcome.REJECTED
