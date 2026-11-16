@@ -1,0 +1,13 @@
+# Slack-style: the timestamp travels in its own header but is still part of
+# the signed string ("v0:<ts>:<body>"), so it cannot be altered undetected.
+name: slack
+description: Slack-style "v0=<hex>" over "v0:timestamp:body", timestamp in a separate header
+algorithm: sha256
+signed_payload: "v0:{timestamp}:{body}"
+signature_header: X-Slack-Signature
+signature_format: "v0={signature}"
+signature_encoding: hex
+secret_encoding: utf8
+timestamp:
+  tolerance_seconds: 300
+  header: X-Slack-Request-Timestamp

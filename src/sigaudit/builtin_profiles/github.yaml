@@ -1,0 +1,13 @@
+# GitHub-style: "sha256=<hex>" over the raw body. No timestamp.
+# The "ping" event is GitHub's harmless connectivity check, so receivers that
+# route on X-GitHub-Event get an event that should trigger no business logic.
+name: github
+description: GitHub-style X-Hub-Signature-256 "sha256=<hex>" over the raw body (no timestamp)
+algorithm: sha256
+signed_payload: "{body}"
+signature_header: X-Hub-Signature-256
+signature_format: "sha256={signature}"
+signature_encoding: hex
+secret_encoding: utf8
+extra_headers:
+  X-GitHub-Event: ping

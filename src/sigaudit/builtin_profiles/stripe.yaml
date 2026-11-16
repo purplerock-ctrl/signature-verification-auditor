@@ -1,0 +1,13 @@
+# Stripe-style: the timestamp is signed together with the body and both are
+# sent in one header, so a receiver can reject stale (replayed) events.
+# Note: Stripe's secret is used exactly as shown, including the "whsec_" prefix.
+name: stripe
+description: Stripe-style "t=<ts>,v1=<hex>" header; HMAC-SHA256 over "timestamp.body"
+algorithm: sha256
+signed_payload: "{timestamp}.{body}"
+signature_header: Stripe-Signature
+signature_format: "t={timestamp},v1={signature}"
+signature_encoding: hex
+secret_encoding: utf8
+timestamp:
+  tolerance_seconds: 300
