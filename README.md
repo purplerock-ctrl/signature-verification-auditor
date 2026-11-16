@@ -205,6 +205,13 @@ Requires Python 3.11+.
 pip install git+https://github.com/purplerock-ctrl/signature-verification-auditor.git
 ```
 
+To install a specific release (see [Releases](https://github.com/purplerock-ctrl/signature-verification-auditor/releases)
+and the [changelog](CHANGELOG.md)):
+
+```bash
+pip install "git+https://github.com/purplerock-ctrl/signature-verification-auditor.git@v0.1.0"
+```
+
 or, from a clone, for development:
 
 ```bash
