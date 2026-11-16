@@ -75,6 +75,23 @@ A new case needs all of:
 - Keep runtime dependencies minimal; a new dependency needs a good reason.
 - Comments explain *why*. Security-relevant decisions deserve a sentence.
 
+## Releasing (maintainers)
+
+1. In a pull request, bump `__version__` in `src/sigaudit/__init__.py` and
+   move the `[Unreleased]` entries in `CHANGELOG.md` under a new
+   `## [X.Y.Z] - YYYY-MM-DD` heading. Update the comparison links at the bottom.
+2. Merge it once CI is green.
+3. Tag the merge commit on `main` and push the tag:
+
+   ```bash
+   git tag -a vX.Y.Z -m "sigaudit vX.Y.Z"
+   git push origin vX.Y.Z
+   ```
+
+The `Release` workflow then checks the tag matches the package version, runs
+the tests, builds the sdist and wheel, and publishes a GitHub Release using
+that version's changelog section as the notes.
+
 ## Commit messages and pull requests
 
 Small, focused PRs are easiest to review. Describe what changed and why, and
