@@ -14,6 +14,8 @@ All notable changes to this project are documented here. The format follows
   test runs the audit in CI and confirms Stripe's library accepts sigaudit's
   signatures.
 - `examples` install extra (`pip install -e ".[examples]"`).
+- Dependabot configuration: a weekly grouped PR keeps the SHA-pinned GitHub
+  Actions up to date.
 
 ## [0.1.0] - 2026-11-16
 

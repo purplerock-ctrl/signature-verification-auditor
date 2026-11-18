@@ -75,6 +75,14 @@ A new case needs all of:
 - Keep runtime dependencies minimal; a new dependency needs a good reason.
 - Comments explain *why*. Security-relevant decisions deserve a sentence.
 
+## Dependency updates
+
+Workflows pin GitHub Actions to full commit SHAs. Dependabot
+(`.github/dependabot.yml`) opens one grouped PR a week when any of them has a
+new release, updating both the SHA and its `# vX.Y.Z` comment. Review the
+actions' release notes, especially for a major-version bump, and merge once
+CI is green.
+
 ## Releasing (maintainers)
 
 1. In a pull request, bump `__version__` in `src/sigaudit/__init__.py` and
