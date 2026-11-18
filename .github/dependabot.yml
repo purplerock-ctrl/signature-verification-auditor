@@ -1,0 +1,19 @@
+# Dependabot keeps the GitHub Actions used by our workflows up to date.
+#
+# The workflows pin each action to a full commit SHA (see ci.yml and
+# release.yml). Dependabot understands those pins: when an action releases a
+# new version, it opens a PR that updates both the SHA and the "# vX.Y.Z"
+# comment. CI runs on that PR like any other, so nothing changes until a
+# maintainer reviews and merges it.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    # One PR per week for all action updates, instead of one PR per action.
+    groups:
+      github-actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: ci
