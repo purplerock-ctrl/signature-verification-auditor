@@ -40,6 +40,11 @@ dev = [
     "mypy>=1.10",
     "types-PyYAML",
 ]
+# Dependencies of examples/stripe-receiver (and its test).
+examples = [
+    "flask>=3.0",
+    "stripe>=10.0",
+]
 
 [project.scripts]
 sigaudit = "sigaudit.cli:main"

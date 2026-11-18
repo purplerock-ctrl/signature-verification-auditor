@@ -240,6 +240,16 @@ sigaudit demo --markdown-report demo.md           # see what a report looks like
 Available flaws: `no-verification`, `skip-if-missing`, `fail-open`, `log-only`,
 `no-timestamp-check`, `accept-sha1`.
 
+### Case study: a real Stripe receiver
+
+[`examples/stripe-receiver/`](examples/stripe-receiver/) is a small Flask app
+with two endpoints. One verifies with Stripe's official library; the other uses
+hand-written code with two common mistakes. sigaudit finds nothing wrong with
+the first and three findings in the second, and the receiver's log shows the
+forged events reaching its business logic. The guide walks through running
+the audit, confirming the findings, and fixing the code yourself, all on your
+own machine.
+
 ---
 
 ## Usage

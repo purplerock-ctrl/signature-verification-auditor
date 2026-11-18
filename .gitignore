@@ -33,3 +33,7 @@ reports/
 # Never commit secrets
 .env
 *.secret
+
+# Reports written while following examples/stripe-receiver
+examples/**/*-report.md
+examples/**/*-report.json

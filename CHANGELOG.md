@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `examples/stripe-receiver/`: a case study with a Flask receiver that has a
+  correct endpoint (Stripe's official library) and a naive one with two
+  common mistakes, plus a step-by-step guide to auditing and fixing it. A
+  test runs the audit in CI and confirms Stripe's library accepts sigaudit's
+  signatures.
+- `examples` install extra (`pip install -e ".[examples]"`).
+
 ## [0.1.0] - 2026-11-16
 
 First public release.
